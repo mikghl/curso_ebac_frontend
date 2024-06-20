@@ -1,48 +1,55 @@
-$(document).ready(function() {
-    $('#cep').mask('00000-000');
+// $(document).ready(function(){
+//     const avatar = $('#avatar');
+//     const nome = $('#name');
+//     const nomeDeUsuario = $('#username');
+//     const repositorio = $('#repos');
+//     const seguidores = $('#followers');
+//     const seguindo = $('#following');
+//     const link = $('#link');
 
-    $('#btn-buscar-cep').click(function() {
-        const cep = $('#cep').val();
-        if (cep.length < 8) {
-            alert('Digite um CEP válido');
-            return;
-        }
+//     const endpoint = 'https://api.github.com/users/mikghl';
 
-        const endpoint = `https://viacep.com.br/ws/${cep}/json/`;
-        const botao = $(this);
-        $(botao).find('i').addClass('d-none');
-        $(botao).find('span').removeClass('d-none');
+//     $.ajax(endpoint).done(function(git) {
+//         nome.text(git.name);
+//         nomeDeUsuario.text(git.login);
+//         repositorio.text(git.public_repos);
+//         seguidores.text(git.followers);
+//         seguindo.text(git.following);
+//         link.attr('href', git.html_url);
+//         avatar.attr('src', git.avatar_url);
+//     });
+// })
 
-        fetch(endpoint).then(function(resposta) {
-            if (!resposta.ok) {
-                throw new Error('Erro na requisição: ' + resposta.statusText);
-            }
-            return resposta.json();
-        }).then(function(resposta) {
-            const logradouro = resposta.logradouro;
-            const bairro = resposta.bairro;
-            const cidade = resposta.localidade;
-            const estado = resposta.uf;
-            const endereco = `${logradouro}, ${bairro} - ${cidade} - ${estado}`;
-            $('#endereco').val(endereco);
-        }).catch(function(error) {
-            alert('Ocorreu um erro: ' + error.message);
-        }).finally(function() {
-            setTimeout(function() {
-                $(botao).find('i').removeClass('d-none');
-                $(botao).find('span').addClass('d-none');
-            }, 500);
-        });
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    const avatar = document.getElementById('avatar');
+    const nome = document.getElementById('name');
+    const nomeDeUsuario = document.getElementById('username');
+    const repositorio = document.getElementById('repos');
+    const seguidores = document.getElementById('followers');
+    const seguindo = document.getElementById('following');
+    const link = document.getElementById('link');
 
-    $('#formulario-pedido').submit(function(evento) {
-        evento.preventDefault();
-        try {
-            if ($('#nome').val().length == 0) {
-                throw new Error('Digite seu nome');
-            }
-        } catch (error) {
-            alert('Erro no formulário: ' + error.message);
-        }
-    });
+    const endpoint = 'https://api.github.com/users/mikghl';
+
+    try {
+        fetch(endpoint).then(function(git) {
+                return git.json();
+            })
+            .then(function(git) {
+                nome.innerText = git.name;
+                nomeDeUsuario.innerText = git.login;
+                repositorio.innerText = git.public_repos;
+                seguidores.innerText = git.followers;
+                seguindo.innerText = git.following;
+                link.href = git.html_url;
+                avatar.src = git.avatar_url;
+            })
+            .catch(function(error) {
+                console.error('Erro na requisição:', error);
+                alert('Não foi possível carregar as informações do GitHub.');
+            });
+    } catch (error) {
+        console.error('Erro ao tentar fazer a requisição:', error);
+        alert('Ocorreu um erro ao tentar buscar os dados do GitHub.');
+    }
 });
